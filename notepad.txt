@@ -1,0 +1,74 @@
+Edit <code>src/App.js</code> and save to reload.
+
+Volumes are the preferred mechanism for persisting data generated 
+by and used by Docker containers. ... 
+You can manage volumes using Docker CLI commands or the Docker API. 
+Volumes work on both Linux and Windows containers. Volumes can be 
+more safely shared among multiple containers.
+
+React App Exited With Code 0
+4-1-2020
+
+Recently, a bug was introduced with the latest Create React App version that is causing the React app to exit when starting with Docker Compose.
+
+To Resolve this:
+
+Add stdin_open property to your docker-compose.yml file
+
+  web:
+    stdin_open: true
+Make sure you rebuild your containers after making this change with  docker-compose down && docker-compose up --build
+
+https://github.com/facebook/create-react-app/issues/8688
+
+https://stackoverflow.com/questions/60790696/react-scripts-start-exiting-in-docker-foreground-cmd
+
+
+
+Either a path to a directory containing a Dockerfile, or a url to a git repository. 
+When the value supplied is a relative path, it is interpreted as relative to the location of the Compose file. 
+This directory is also the build context that is sent to the Docker daemon
+
+
+Remember, docker-compose. yml files are used for defining and running multi-container Docker applications, whereas Dockerfiles 
+are simple text files that contain the commands to assemble an image that will be used to deploy containers. So the workflow looks like this: 
+Create Dockerfiles to build images.
+
+
+In the upcoming lecture, Stephen will accidentally attach to the Web container instead of the Tests container. 
+Since the contents of the containers are the same, this will yield the exact same results and the explanation remains valid.
+
+Named Builders and AWS
+
+updated 10-1-2020
+
+In the next lecture, we will be creating a multi-step build in our production Dockerfile. When we deploy to AWS in section 7, this currently will fail if you attempt to use a named builder as shown.
+
+To remedy this, we should create an unnamed builder like so:
+
+Instead of this:
+
+FROM node:alpine as builder
+WORKDIR '/app'
+COPY package.json .
+RUN npm install
+COPY . .
+RUN npm run build
+ 
+FROM nginx
+COPY --from=builder /app/build /usr/share/nginx/html
+Do this:
+
+FROM node:alpine
+WORKDIR '/app'
+COPY package.json .
+RUN npm install
+COPY . .
+RUN npm run build
+ 
+FROM nginx
+COPY --from=0 /app/build /usr/share/nginx/html
+
+
+Fullscreen
+$%&T23red3736226##T1dWay$%&
